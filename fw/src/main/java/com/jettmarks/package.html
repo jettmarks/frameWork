@@ -1,0 +1,18 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head></head>
+<body>
+  Provides framework for common app functionality: version reporting and 
+  argument parsing.
+  
+  The Versioning is dependent on placement of properties within the .jar file.
+  These properties are intended to be maintained by Maven, but can be placed
+  either manually, using Ant, or other methods.  
+  
+  The Argument Parsing is built upon the commons-cli API.  The framework 
+  includes a main(String args[]) method which calls the application's entry 
+  point.  This entry point is defined by the application by extending
+  the class ArgParsingEntryPoint and implementing the methods for parsing and
+  then executing.
+</body>
+</html>

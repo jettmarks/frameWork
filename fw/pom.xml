@@ -1,0 +1,197 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.jettmarks.fw</groupId>
+  <artifactId>fw</artifactId>
+  <packaging>jar</packaging>
+  <version>1.2</version>
+  <name>fw</name>
+  <reporting>
+    <outputDirectory>V:/home/java/fw</outputDirectory>
+  </reporting>
+  <inceptionYear>2009</inceptionYear>
+	<issueManagement>
+		<system>JIRA</system>
+		<url>http://jira.jettmarks.com/jira/</url>
+	</issueManagement>
+	<scm>
+		<developerConnection>
+			scm:svn:http://jett@localhost/svn/java/base
+		</developerConnection>
+		<url>http://jett@localhost/svn/java/base</url>
+	</scm>
+	<organization>
+		<name>Jett Marks Consulting</name>
+		<url>http://jettmarks.com</url>
+	</organization>
+	<description>
+		Example project for Maven-generated executable jar that has an
+		automatically incremented build number and can print its own
+		version/build information.
+
+		This simple example adds a pass parameter to a MySQL database in
+		service of recording IP routes that have been blacklisted for
+		attacking my FTP or SSH server.
+	</description>
+	<url>http://fw.jettmarks.com</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+		<dependency>
+			<groupId>commons-cli</groupId>
+			<artifactId>commons-cli</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.8</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+		</dependency>
+  </dependencies>
+
+	<!-- 
+		<pluginRepositories>
+		<pluginRepository>
+		<id>tlc</id>
+		<name>TLC Repository</name>
+		<url>http://commons.ucalgary.ca/pub/m2</url>
+		</pluginRepository>
+		</pluginRepositories>
+	-->
+
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<version>2.2</version>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+				</configuration>
+			</plugin>
+			<plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>unit-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <excludes>
+                                <exclude>**/ManifestVersionTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>integration-tests</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skip>false</skip>
+                            <includes>
+                                <include>**/ManifestVersionTest.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0-beta-3</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<format>
+						{0,number}@{1,date,yyyy/MM/dd HH:mm:ss}
+					</format>
+					<items>
+						<item>buildNumber0</item>
+						<item>timestamp</item>
+					</items>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-2</version>
+				<!--   <artifactId>maven-jar-plugin</artifactId> -->
+				<configuration>
+
+					<!--  Added to try the assembly -->
+					<descriptors>
+						<descriptor>
+							jar-with-dependencies.xml
+						</descriptor>
+					</descriptors>
+					<!-- Tried different options for this value:
+						target: works fine command-line, but m2eclipse adds extra path
+						to the front of the paths of expanded classes.
+						/: works for both command-line and m2eclipse, but the generated
+						.jar file ends up in two different locations; m2eclipse as 
+						expected, but command-line puts it in the root of the DOS dir.
+						./: works for both and the .jar ends up in the expected dir.  -->
+					<outputDirectory>./</outputDirectory>
+					<workDirectory>/target/assembly/work</workDirectory>
+
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>
+								true
+							</addDefaultImplementationEntries>
+							<mainClass>
+								com.jettmarks.base.ArgParsingMain
+							</mainClass>
+						</manifest>
+						<!--  Messes up the rest of this 
+							<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>   -->
+						<manifestEntries>
+							<Implementation-Build>
+								${buildNumber}
+							</Implementation-Build>
+						</manifestEntries>
+					</archive>
+
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
